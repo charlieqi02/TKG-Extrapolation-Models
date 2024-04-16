@@ -9,7 +9,7 @@ from ._utils import load_all_answers_for_time_filter, split_by_time
 class TKGDataset(object):
     """Temporal Knowledge Graph dataset class."""
 
-    def __init__(self, dataset, debug):
+    def __init__(self, dataset, debug, debug_len):
         """Creates TKG dataset object for data loading.
 
         Args:
@@ -18,7 +18,7 @@ class TKGDataset(object):
         data_path = os.environ["DATA_PATH"]
         data = load_from_local(data_path, dataset)
         self.debug = debug
-        self.debug_len = 10
+        self.debug_len = debug_len
         self.num_ent = data.num_nodes
         self.num_rel = data.num_rels
               

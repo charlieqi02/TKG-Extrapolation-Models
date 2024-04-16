@@ -32,7 +32,7 @@ def load_auxdata(args):
         static_graph = build_sub_graph(static_num_words + args.sizes[0], static_triples, args.gpu)
         aux_data['static'] = static_graph
     else:
-        raise NotImplementedError
+        pass
         
     return aux_data, args
 
