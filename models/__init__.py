@@ -1,4 +1,4 @@
-# from .hyperbolic_atth import *
+from .hyperb_atth import *
 from .regcn import *
 
-all_models = REGCN_MODELS #+ HYP_MODELS
+all_models = REGCN_MODELS + HYP_MODELS

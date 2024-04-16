@@ -32,7 +32,7 @@ parser.add_argument(
 parser.add_argument(
     "--model", choices=all_models, default="SimREGCN", help="Temporal Knowledge Graph embedding model")
 parser.add_argument(
-    "--regularizer", choices=["N3", "F2", "Static"], default="N3", help="Regularizer")
+    "--regularizer", choices=["R0", "Static"], default="R0", help="Regularizer")
 parser.add_argument(
     "--optimizer", choices=["Adagrad", "Adam", "SparseAdam"], default="Adam", help="Optimizer")
 parser.add_argument(
@@ -83,19 +83,11 @@ parser.add_argument(
 
 ## ATTH
 parser.add_argument(
-    "--neg_sample_size", default=50, type=int, help="Negative sample size, -1 to not use negative sampling")
-parser.add_argument(
     "--init_size", default=1e-3, type=float, help="Initial embeddings' scale")
 parser.add_argument(
-    "--gamma", default=0, type=float, help="Margin for distance-based losses")
+    "--multi_c", action="store_true", help="Multiple curvatures per relation")
 parser.add_argument(
-    "--bias", default="constant", type=str, choices=["constant", "learn", "none"], help="Bias type (none for no bias)")
-parser.add_argument(
-    "--double_neg", action="store_true",
-    help="Whether to negative sample both head and tail entities")
-parser.add_argument(
-    "--multi_c", action="store_true", help="Multiple curvatures per relation"
-)
+    "--dtype", default="double", type=str, choices=["single", "double"], help="Machine precision")
 
 
 
@@ -124,7 +116,7 @@ def train(args):
         
 
     # create dataset
-    dataset = TKGDataset(args.dataset, args.debug)
+    dataset = TKGDataset(args.dataset, args.debug, args.debug_len)
     args.sizes = dataset.get_shape()    
     # load data
     train_list = dataset.get_snaps("train")
