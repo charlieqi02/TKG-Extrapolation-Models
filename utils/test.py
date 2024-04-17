@@ -78,12 +78,13 @@ def _filter_score(test_triples, score, all_ans):
 
 
 def stat_ranks(rank_list):
+    """x 100%"""
     hits = [1, 3, 10]
     total_rank = torch.cat(rank_list)
 
-    mrr = torch.mean(1.0 / total_rank.float()).item()
+    mrr = torch.mean(1.0 / total_rank.float()).item() * 100
     hit_results = []
     for hit in hits:
-        avg_count = torch.mean((total_rank <= hit).float()).item()
+        avg_count = torch.mean((total_rank <= hit).float()).item() * 100
         hit_results.append(avg_count)
     return mrr, hit_results

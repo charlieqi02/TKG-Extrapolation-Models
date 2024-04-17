@@ -13,7 +13,7 @@ from datasets.auxdata import load_auxdata
 from datasets.tkg_dataset import TKGDataset
 from models import all_models
 from optimizers.tkg_optimizer import TKGOptimizer
-from utils.recorder import Recorder
+from recorder import Recorder
 from utils.train import count_params, get_savedir, set_seed
 
 parser = argparse.ArgumentParser(
@@ -61,6 +61,11 @@ parser.add_argument(
     "--debug", default=False, action='store_true', help="Decrease data length for debugging")
 parser.add_argument(
     "--debug_len", default=10, type=int, help="Decreased data length for debugging")
+
+
+## Advanced record option
+parser.add_argument(
+    "--record_atth", default=False, action='store_true', help="Entity embedding l2 norm and multi-c record option")
 
 
 # model specific arguments
@@ -134,7 +139,8 @@ def train(args):
     regularizer = getattr(regularizers, args.regularizer)(args)
     optim_method = getattr(torch.optim, args.optimizer)(model.parameters(), lr=args.learning_rate)
     # get recorder (include load checkpoint)
-    recorder = Recorder(save_dir, args.continue_train, model, optim_method)
+    recorder = Recorder(save_dir, args, model, optim_method, 
+                        aux_data, train_list, valid_list, test_list)
     # get optimizer
     optimizer = TKGOptimizer(model, regularizer, optim_method, args.reg_alpha, args.label_smoothing,
                             args.seq_len, args.grad_norm)  
@@ -145,19 +151,19 @@ def train(args):
         # Train step
         model.train()
         train_records = optimizer.epoch(train_list, aux_data)
-        recorder.log_train_records(train_records, step)
-        train_records = None    # trash collection
+        recorder.train_recording(train_records, step)
 
         # Valid step
         model.eval()
         valid_records = optimizer.get_valid_LossAndMetric(train_list, valid_list, aux_data, valid_ans4tf)
-        recorder.log_valid_records_and_save_best(valid_records, step, 'valid', model)
-        valid_records = None    # trash collection
+        recorder.valid_recording(valid_records, step, 'valid', model)
 
         # Test step (Shouldn't do, but ...)
         test_records = optimizer.get_valid_LossAndMetric(train_list+valid_list, test_list, aux_data, test_ans4tf)
-        recorder.log_valid_records_and_save_best(test_records, step, 'test', model)
-        test_records = None     # trash collection
+        recorder.valid_recording(test_records, step, 'test', model)
+
+        # Inner record
+        recorder.inner_recording(model, step)
 
         # save checkpoint and best models (for test/valid raw/filter each)
         recorder.save_checkpoint(model, optim_method, step)
