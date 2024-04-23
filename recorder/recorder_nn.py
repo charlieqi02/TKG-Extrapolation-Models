@@ -13,11 +13,19 @@ class RecorderInnerModel(object):
         
         self.atth_paths = [os.path.join(self.inner_save_dir, "atth_entembl2.csv"),
                            os.path.join(self.inner_save_dir, "atth_multic.csv")]
+        self.mode_paths = lambda x: os.path.join(self.inner_save_dir, f"model_record_{x}.pt")
         
         self.aux_data = aux_data
         self.train_list = train_list
         self.valid_list = valid_list
         self.test_list = test_list
+        
+        
+    def model_record(self, model, epoch):
+        """Save entire model at certain epoch."""
+        logging.info(f"Saving model params for recording at epoch {epoch} ...")
+        torch.save(model.cpu().state_dict(), self.mode_paths(epoch))
+        model.cuda()
         
         
     def atth_record(self, model):

@@ -66,6 +66,8 @@ parser.add_argument(
 ## Advanced record option
 parser.add_argument(
     "--record_atth", default=False, action='store_true', help="Entity embedding l2 norm and multi-c record option")
+parser.add_argument(
+    "--record_model", default=0, type=int, help="Record model params every X epoch (0 -> no record)")
 
 
 # model specific arguments

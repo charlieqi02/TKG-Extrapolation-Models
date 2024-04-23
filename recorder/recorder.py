@@ -23,7 +23,8 @@ class Recorder:
         
         # advanced
         self.recorder_nn = RecorderInnerModel(save_dir, aux_data, train_list, valid_list, test_list)
-        self.atth_record = args.record_atth
+        self.atth_record = args.record_atth     # default False
+        self.model_record = args.record_model   # default 0
         
         
     def train_recording(self, records, epoch):
@@ -45,6 +46,8 @@ class Recorder:
         """Record what's happending inside the model."""
         if self.atth_record:
             self.recorder_nn.atth_record(model)
+        elif self.model_record and (epoch - 1) % self.model_record == 0:
+            self.recorder_nn.model_record(model, epoch)
         else:
             pass       
         
